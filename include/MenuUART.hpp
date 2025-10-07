@@ -1,6 +1,7 @@
 #pragma once
 #include "Menu.hpp"
 #include "UARTInterface.hpp"
+#include "UsuarioManager.hpp"
 #include <string>
 
 enum class MenuOption {
@@ -15,10 +16,11 @@ enum class MenuOption {
 class MenuUART : public Menu {
   private:
     UARTInterface& uart;
+    UsuarioManager& usuarioManager;
     bool running;
 
   public:
-    explicit MenuUART(UARTInterface& uartInterface);
+    explicit MenuUART(UARTInterface& uartInterface, UsuarioManager& usuarioManager);
     MenuOption parseOption(const std::string& input);
     std::string getMenuOptionText(MenuOption option);
     void show() override;

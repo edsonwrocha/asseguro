@@ -10,6 +10,8 @@ add_executable(asseguro
   src/main.cpp
   src/MenuUART.cpp
   src/UARTInterface.cpp
+  src/UsuarioManager.cpp
+  src/Usuario.cpp
 )
 
 target_include_directories(asseguro PUBLIC 

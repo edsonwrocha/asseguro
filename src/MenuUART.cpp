@@ -1,7 +1,9 @@
 #include "MenuUART.hpp"
+#include "Usuario.hpp"
+#include "UsuarioManager.hpp"
 
-MenuUART::MenuUART(UARTInterface& uartInterface)
-    : uart(uartInterface), running(true) {}
+MenuUART::MenuUART(UARTInterface& uartInterface, UsuarioManager& usuarioManager)
+    : uart(uartInterface), usuarioManager(usuarioManager), running(true) {}
 
 std::string MenuUART::getMenuOptionText(MenuOption option) {
     switch (option) {
@@ -61,7 +63,11 @@ void MenuUART::handleInput(const std::string& input) {
 
         uart.write("Tipo [1] Admin, [0] Regular: ");
         std::string tipoStr = uart.readLine();
-        bool isAdmin = (tipoStr == "1");
+
+        TipoUsuario tipo = (tipoStr == "1") ? TipoUsuario::ADMIN : TipoUsuario::REGULAR;
+        Usuario novo(nome, senha, tipo);
+
+        usuarioManager.adicionarUsuario(novo);
 
         uart.write("Usuário criado com sucesso!\n");
         uart.write("Pressione Enter para voltar ao menu: ");
