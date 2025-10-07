@@ -1,0 +1,25 @@
+Checks: '
+-*,
+bugprone-argument-comment,
+bugprone-use-after-move,
+bugprone-string-constructor,
+bugprone-unhandled-self-assignment,
+
+misc-unused-using-decls,
+misc-definitions-in-headers,
+
+modernize-use-nullptr,
+modernize-use-emplace,
+modernize-use-equals-default,
+modernize-use-noexcept,
+modernize-deprecated-headers,
+
+performance-unnecessary-value-param,
+performance-inefficient-string-concatenation,
+
+readability-redundant-declaration,
+readability-const-return-type
+'
+
+HeaderFilterRegex: '.*'
+WarningsAsErrors: ''

@@ -1,0 +1,25 @@
+Language:        Cpp
+Standard:        c++20
+
+IndentWidth:     4      
+UseTab:          Never   
+
+BreakBeforeBraces: Attach
+BraceWrapping:
+  AfterClass:     true
+  AfterFunction:  true
+
+PointerAlignment: Left  
+SpaceBeforeParens: ControlStatements
+SpacesInParentheses: false
+SpacesInAngles:   false
+SpacesInContainerLiterals: true 
+
+ColumnLimit:     0  
+AllowShortFunctionsOnASingleLine: All
+AllowShortIfStatementsOnASingleLine: true
+AllowShortLoopsOnASingleLine: false
+
+MaxEmptyLinesToKeep: 2
+KeepEmptyLinesAtTheStartOfBlocks: false
+
