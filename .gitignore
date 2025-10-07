@@ -1,0 +1,15 @@
+# Diretório de Build
+build/
+
+# Arquivos CMake
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+compile_commands.json
+
+# Clangd
+.clangd
+
+# Editor cache
+.cache/
