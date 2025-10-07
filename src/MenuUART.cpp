@@ -74,10 +74,30 @@ void MenuUART::handleInput(const std::string& input) {
         uart.readLine();
         break;
     }
-    case MenuOption::LIST_USERS:
-        uart.write("Listando usuários...\n");
-        break;
+    case MenuOption::LIST_USERS: {
+        uart.write("Listando usuários...\n\n");
 
+        // Cabeçalho
+        uart.write("NOME                      | TIPO\n");
+        uart.write("--------------------------|------\n");
+
+        auto usuarios = usuarioManager.listarUsuarios();
+        for (const auto& u : usuarios) {
+            std::string nome = u.getNome();
+            std::string tipo = (u.getTipo() == TipoUsuario::ADMIN ? "ADMIN" : "REGULAR");
+
+            // Definindo largura fixa da coluna de nomes (25 caracteres)
+            if (nome.length() < 25)
+                nome += std::string(25 - nome.length(), ' '); // adiciona espaços à direita
+
+            std::string linha = nome + " | " + tipo + "\n";
+            uart.write(linha);
+        }
+
+        uart.write("\nPressione Enter para voltar ao menu: ");
+        uart.readLine();
+        break;
+    }
     case MenuOption::LIST_EVENTS:
         uart.write("Listando eventos...\n");
         break;

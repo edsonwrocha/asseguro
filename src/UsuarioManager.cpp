@@ -3,7 +3,9 @@
 #include <fstream>
 
 UsuarioManager::UsuarioManager(const std::string& arquivo)
-    : caminhoArquivo(arquivo) {}
+    : caminhoArquivo(arquivo) {
+    carregarDoCSV();
+}
 
 void UsuarioManager::carregarDoCSV() {
     usuarios.clear();
