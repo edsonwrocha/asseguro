@@ -17,6 +17,7 @@ add_executable(asseguro
     src/Evento.cpp
     src/EventoManager.cpp
     src/CurlHTTPCliente.cpp
+    src/UARTReal.cpp
 )
 
 find_package(PkgConfig REQUIRED)
