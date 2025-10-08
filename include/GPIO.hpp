@@ -1,4 +1,7 @@
 #pragma once
+#include <gpiod.hpp>
+#include <iostream>
+#include <optional>
 #include <string>
 
 enum class GPIODirection {
@@ -12,11 +15,14 @@ class GPIO {
     GPIODirection direction;
     bool state;
 
+    // Componentes do libgpiod
+    gpiod::chip chip;
+    std::optional<gpiod::line_request> line_req;
+
   public:
     GPIO(int pin, GPIODirection direction);
-    virtual ~GPIO() = default;
-
-    virtual void write(bool value);
-    virtual bool read() const;
+    ~GPIO();
+    void write(bool value);
+    bool read();
     int getPin() const;
 };
