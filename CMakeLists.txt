@@ -15,6 +15,8 @@ add_executable(asseguro
   src/Porta.cpp
   src/GPIO.cpp
   src/PortaManager.cpp
+  src/Evento.cpp
+  src/EventoManager.cpp
 )
 
 target_include_directories(asseguro PUBLIC 

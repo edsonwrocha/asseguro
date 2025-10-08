@@ -3,8 +3,8 @@
 #include "Usuario.hpp"
 #include "UsuarioManager.hpp"
 
-MenuUART::MenuUART(UARTInterface& uartInterface, UsuarioManager& usuarioManager, PortaManager& portaManager)
-    : uart(uartInterface), usuarioManager(usuarioManager), portaManager(portaManager), running(true) {}
+MenuUART::MenuUART(UARTInterface& uartInterface, UsuarioManager& usuarioManager, PortaManager& portaManager, EventoManager& eventoManager)
+    : uart(uartInterface), usuarioManager(usuarioManager), portaManager(portaManager), eventoManager(eventoManager), running(true) {}
 
 std::string MenuUART::getMenuOptionText(MenuOption option) {
     switch (option) {
@@ -99,9 +99,47 @@ void MenuUART::handleInput(const std::string& input) {
         uart.readLine();
         break;
     }
-    case MenuOption::LIST_EVENTS:
-        uart.write("Listando eventos...\n");
+    case MenuOption::LIST_EVENTS: {
+        uart.write("Listando eventos...\n\n");
+
+        // Cabeçalho
+        uart.write("TIMESTAMP     | USUARIO   | EVENTO\n");
+        uart.write("--------------|-----------|----------------\n");
+
+        auto eventos = eventoManager.listarEventos();
+        for (const auto& e : eventos) {
+            // Timestamp
+            std::string ts = std::to_string(e.getTimestamp());
+            if (ts.length() < 13) // ajusta para 13 caracteres
+                ts = std::string(13 - ts.length(), ' ') + ts;
+
+            // Nome do usuário
+            std::string nome = e.getUsuario();
+            if (nome.length() < 9)
+                nome += std::string(9 - nome.length(), ' ');
+
+            // Tipo de evento
+            std::string tipo;
+            switch (e.getTipo()) {
+            case TipoEvento::ABERTURA_PORTA_1:
+                tipo = "ABERTURA_PORTA_1";
+                break;
+            case TipoEvento::ABERTURA_PORTA_2:
+                tipo = "ABERTURA_PORTA_2";
+                break;
+            case TipoEvento::CRIACAO_USUARIO:
+                tipo = "CRIACAO_USUARIO";
+                break;
+            }
+
+            std::string linha = ts + " | " + nome + " | " + tipo + "\n";
+            uart.write(linha);
+        }
+
+        uart.write("\nPressione Enter para voltar ao menu: ");
+        uart.readLine();
         break;
+    }
 
     case MenuOption::OPEN_DOOR_1: {
         uart.write("Digite o nome: ");
@@ -113,7 +151,7 @@ void MenuUART::handleInput(const std::string& input) {
         senha = uart.readLine();
 
         if (usuarioManager.validarLoginAdmin(nome, senha)) {
-            portaManager.abrirPorta(0);
+            portaManager.abrirPorta(nome, 0);
             uart.write("Porta 1 liberada!\n");
         } else {
             uart.write("Verifique credenciais, acesso liberado apenas para Admin!\n");
@@ -134,7 +172,7 @@ void MenuUART::handleInput(const std::string& input) {
         senha = uart.readLine();
 
         if (usuarioManager.validarLoginAdmin(nome, senha)) {
-            portaManager.abrirPorta(1);
+            portaManager.abrirPorta(nome, 1);
             uart.write("Porta 2 liberada!\n");
         } else {
             uart.write("Verifique credenciais, acesso liberado apenas para Admin!\n");
