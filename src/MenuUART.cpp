@@ -1,9 +1,10 @@
 #include "MenuUART.hpp"
+#include "PortaManager.hpp"
 #include "Usuario.hpp"
 #include "UsuarioManager.hpp"
 
-MenuUART::MenuUART(UARTInterface& uartInterface, UsuarioManager& usuarioManager)
-    : uart(uartInterface), usuarioManager(usuarioManager), running(true) {}
+MenuUART::MenuUART(UARTInterface& uartInterface, UsuarioManager& usuarioManager, PortaManager& portaManager)
+    : uart(uartInterface), usuarioManager(usuarioManager), portaManager(portaManager), running(true) {}
 
 std::string MenuUART::getMenuOptionText(MenuOption option) {
     switch (option) {
@@ -102,13 +103,48 @@ void MenuUART::handleInput(const std::string& input) {
         uart.write("Listando eventos...\n");
         break;
 
-    case MenuOption::OPEN_DOOR_1:
-        uart.write("Porta 1 liberada!\n");
-        break;
+    case MenuOption::OPEN_DOOR_1: {
+        uart.write("Digite o nome: ");
+        std::string nome;
+        nome = uart.readLine();
 
-    case MenuOption::OPEN_DOOR_2:
-        uart.write("Porta 2 liberada!\n");
+        uart.write("Digite a senha: ");
+        std::string senha;
+        senha = uart.readLine();
+
+        if (usuarioManager.validarLoginAdmin(nome, senha)) {
+            portaManager.abrirPorta(0);
+            uart.write("Porta 1 liberada!\n");
+        } else {
+            uart.write("Verifique credenciais, acesso liberado apenas para Admin!\n");
+        }
+
+
+        uart.write("\nPressione Enter para voltar ao menu: ");
+        uart.readLine();
         break;
+    }
+    case MenuOption::OPEN_DOOR_2: {
+        uart.write("Digite o nome: ");
+        std::string nome;
+        nome = uart.readLine();
+
+        uart.write("Digite a senha: ");
+        std::string senha;
+        senha = uart.readLine();
+
+        if (usuarioManager.validarLoginAdmin(nome, senha)) {
+            portaManager.abrirPorta(1);
+            uart.write("Porta 2 liberada!\n");
+        } else {
+            uart.write("Verifique credenciais, acesso liberado apenas para Admin!\n");
+        }
+
+
+        uart.write("\nPressione Enter para voltar ao menu: ");
+        uart.readLine();
+        break;
+    }
 
     default:
         uart.write("Opção inválida!\n");

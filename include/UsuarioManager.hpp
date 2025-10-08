@@ -18,8 +18,9 @@ class UsuarioManager {
 
     std::vector<Usuario> listarUsuarios() const;
 
-    bool validarSenhaUsuario(const std::string& senha) const;
-    bool validarSenhaAdmin(const std::string& senha) const;
+    bool validarLogin(const std::string& nome, const std::string& senha) const;
+    bool validarLoginAdmin(const std::string& nome, const std::string& senha) const;
+
 
     Usuario getUsuarioPorSenha(const std::string& senha) const;
 };
