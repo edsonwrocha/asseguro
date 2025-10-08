@@ -2,7 +2,7 @@
 #include <cstdint>
 #include <iostream>
 
-EventoManager::EventoManager(const std::string& arquivo) : caminhoArquivo(arquivo) {
+EventoManager::EventoManager(const std::string& arquivo, HttpCliente& http, std::string url) : caminhoArquivo(arquivo), http(http), url(url) {
     carregarDoCSV();
 }
 
@@ -32,6 +32,7 @@ void EventoManager::registrarEvento(const Evento& e) {
 
     std::string json = e.toJSON();
     std::cout << json << std::endl;
+    std::cout << http.post(url + "/api/evento", json) << std::endl;
     // enviarEventoModbus(e);
 }
 
