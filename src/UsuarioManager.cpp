@@ -2,8 +2,8 @@
 #include <algorithm>
 #include <fstream>
 
-UsuarioManager::UsuarioManager(const std::string& arquivo)
-    : caminhoArquivo(arquivo) {
+UsuarioManager::UsuarioManager(const std::string& arquivo, EventoManager& eventoManager)
+    : caminhoArquivo(arquivo), eventoManager(eventoManager) {
     carregarDoCSV();
 }
 
@@ -31,6 +31,8 @@ void UsuarioManager::salvarNoCSV() {
 void UsuarioManager::adicionarUsuario(const Usuario& usuario) {
     usuarios.push_back(usuario);
     salvarNoCSV(); // salva imediatamente
+    Evento e(usuario.getNome(), TipoEvento::CRIACAO_USUARIO);
+    eventoManager.registrarEvento(e);
 }
 
 std::vector<Usuario> UsuarioManager::listarUsuarios() const {

@@ -1,4 +1,5 @@
 #pragma once
+#include "EventoManager.hpp"
 #include "Usuario.hpp"
 #include <string>
 #include <vector>
@@ -7,9 +8,10 @@ class UsuarioManager {
   private:
     std::vector<Usuario> usuarios;
     std::string caminhoArquivo;
+    EventoManager& eventoManager;
 
   public:
-    explicit UsuarioManager(const std::string& arquivo);
+    explicit UsuarioManager(const std::string& arquivo, EventoManager& eventoManager);
 
     void carregarDoCSV();
     void salvarNoCSV();
