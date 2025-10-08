@@ -1,5 +1,6 @@
 #pragma once
 #include "Menu.hpp"
+#include "PortaManager.hpp"
 #include "UARTInterface.hpp"
 #include "UsuarioManager.hpp"
 #include <string>
@@ -17,10 +18,11 @@ class MenuUART : public Menu {
   private:
     UARTInterface& uart;
     UsuarioManager& usuarioManager;
+    PortaManager& portaManager;
     bool running;
 
   public:
-    explicit MenuUART(UARTInterface& uartInterface, UsuarioManager& usuarioManager);
+    explicit MenuUART(UARTInterface& uartInterface, UsuarioManager& usuarioManager, PortaManager& portaManager);
     MenuOption parseOption(const std::string& input);
     std::string getMenuOptionText(MenuOption option);
     void show() override;

@@ -37,14 +37,18 @@ std::vector<Usuario> UsuarioManager::listarUsuarios() const {
     return usuarios;
 }
 
-bool UsuarioManager::validarSenhaUsuario(const std::string& senha) const {
+bool UsuarioManager::validarLogin(const std::string& nome, const std::string& senha) const {
     return std::any_of(usuarios.begin(), usuarios.end(),
-                       [&](const Usuario& u) { return u.getSenha() == senha; });
+                       [&](const Usuario& u) {
+                           return u.getNome() == nome && u.getSenha() == senha;
+                       });
 }
 
-bool UsuarioManager::validarSenhaAdmin(const std::string& senha) const {
+bool UsuarioManager::validarLoginAdmin(const std::string& nome, const std::string& senha) const {
     return std::any_of(usuarios.begin(), usuarios.end(),
-                       [&](const Usuario& u) { return u.getSenha() == senha && u.isAdmin(); });
+                       [&](const Usuario& u) {
+                           return u.getNome() == nome && u.getSenha() == senha && u.isAdmin();
+                       });
 }
 
 Usuario UsuarioManager::getUsuarioPorSenha(const std::string& senha) const {

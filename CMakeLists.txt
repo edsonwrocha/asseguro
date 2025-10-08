@@ -12,6 +12,9 @@ add_executable(asseguro
   src/UARTInterface.cpp
   src/UsuarioManager.cpp
   src/Usuario.cpp
+  src/Porta.cpp
+  src/GPIO.cpp
+  src/PortaManager.cpp
 )
 
 target_include_directories(asseguro PUBLIC 
