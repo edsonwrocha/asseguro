@@ -3,9 +3,10 @@
 
 PortaManager::PortaManager(EventoManager& eventoManager) : eventoManager(eventoManager) {}
 
-void PortaManager::adicionarPorta(const Porta& porta) {
-    portas.push_back(porta);
-    std::cout << "[PortaManager] Porta '" << porta.getNome() << "' adicionada.\n";
+void PortaManager::adicionarPorta(int pin, const std::string& nome) {
+    portas.push_back(std::make_unique<Porta>(pin, nome));
+
+    std::cout << "[PortaManager] Porta '" << nome << "' adicionada.\n";
 }
 
 bool PortaManager::abrirPorta(std::string& nome, int id) {
@@ -14,7 +15,7 @@ bool PortaManager::abrirPorta(std::string& nome, int id) {
         return false;
     }
 
-    portas[id].abrir();
+    portas[id]->abrirComTimeout(5000);
     Evento e;
     if (id == 0) {
         e = Evento(nome, TipoEvento::ABERTURA_PORTA_1);
@@ -31,6 +32,6 @@ bool PortaManager::fecharPorta(int id) {
         return false;
     }
 
-    portas[id].fechar();
+    portas[id]->fechar();
     return true;
 }

@@ -1,6 +1,8 @@
 #pragma once
 #include "GPIO.hpp"
+#include <chrono>
 #include <string>
+#include <thread>
 
 class Porta : public GPIO {
   private:
@@ -10,8 +12,9 @@ class Porta : public GPIO {
     Porta(int pin, const std::string& nome);
 
     void abrir();
+    void abrirComTimeout(int timeout_ms);
     void fechar();
-    bool estaAberta() const;
+    bool estaAberta();
 
     const std::string& getNome() const { return nome; }
 };

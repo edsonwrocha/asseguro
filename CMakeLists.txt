@@ -28,3 +28,10 @@ target_include_directories(asseguro PUBLIC
 )
 
 target_link_libraries(asseguro PRIVATE ${CURL_LIBRARIES})
+
+# Libgpiodcxx
+find_library(GPIODXX_LIB gpiodcxx)
+if(NOT GPIODXX_LIB)
+    message(FATAL_ERROR "libgpiodcxx não encontrada")
+endif()
+target_link_libraries(asseguro PRIVATE ${GPIODXX_LIB})
