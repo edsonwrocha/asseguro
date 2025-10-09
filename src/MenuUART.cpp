@@ -99,40 +99,51 @@ void MenuUART::handleInput(const std::string& input) {
         uart.readLine();
         break;
     }
+
     case MenuOption::LIST_EVENTS: {
-        uart.write("Listando eventos...\n\n");
+        uart.write("Listando eventos em formato de tabela...\n\n");
 
         // Cabeçalho
-        uart.write("TIMESTAMP     | USUARIO   | EVENTO\n");
-        uart.write("--------------|-----------|----------------\n");
+        uart.write("TIMESTAMP            | TIPO_EVENTO        | USUARIO       | PORTA | ACAO       | MODBUS\n");
+        uart.write("---------------------|--------------------|---------------|-------|------------|--------\n");
 
         auto eventos = eventoManager.listarEventos();
         for (const auto& e : eventos) {
-            // Timestamp
-            std::string ts = std::to_string(e.getTimestamp());
-            if (ts.length() < 13) // ajusta para 13 caracteres
-                ts = std::string(13 - ts.length(), ' ') + ts;
+            // Timestamp em ISO 8601
+            std::time_t tims = e.getTimestamp();
+            std::tm tm_val;
+            gmtime_r(&tims, &tm_val); // versão thread-safe
 
-            // Nome do usuário
-            std::string nome = e.getUsuario();
-            if (nome.length() < 9)
-                nome += std::string(9 - nome.length(), ' ');
+            char buf[21]; // "YYYY-MM-DDTHH:MM:SSZ" + '\0'
+            std::strftime(buf, sizeof(buf), "%Y-%m-%dT%H:%M:%SZ", &tm_val);
+            std::string ts(buf);
 
             // Tipo de evento
             std::string tipo;
-            switch (e.getTipo()) {
-            case TipoEvento::ABERTURA_PORTA_1:
-                tipo = "ABERTURA_PORTA_1";
-                break;
-            case TipoEvento::ABERTURA_PORTA_2:
-                tipo = "ABERTURA_PORTA_2";
-                break;
-            case TipoEvento::CRIACAO_USUARIO:
-                tipo = "CRIACAO_USUARIO";
-                break;
-            }
+            if (e.getTipo() == TipoEvento::CRIACAO_USUARIO)
+                tipo = "criar_usuario";
+            else if (e.getTipo() == TipoEvento::ABERTURA_PORTA)
+                tipo = "movimentacao_porta";
+            else
+                tipo = "outro_tipo";
 
-            std::string linha = ts + " | " + nome + " | " + tipo + "\n";
+            // Ajusta tamanho das colunas
+            if (tipo.length() < 18) tipo += std::string(18 - tipo.length(), ' ');
+            std::string usuario = e.getUsuario();
+            if (usuario.length() < 13) usuario += std::string(13 - usuario.length(), ' ');
+
+            // Campos adicionais (porta, ação, modbus)
+            std::string porta = (e.getTipo() == TipoEvento::ABERTURA_PORTA) ? std::to_string(e.getPorta()) : "-";
+            if (porta.length() < 5) porta += std::string(5 - porta.length(), ' ');
+
+            std::string acao = (e.getTipo() == TipoEvento::ABERTURA_PORTA) ? e.getAcao() : "-";
+            if (acao.length() < 10) acao += std::string(10 - acao.length(), ' ');
+
+            std::string modbus = (e.getTipo() == TipoEvento::ABERTURA_PORTA) ? e.getModbus() : "-";
+            if (modbus.length() < 6) modbus += std::string(6 - modbus.length(), ' ');
+
+            // Linha completa
+            std::string linha = ts + " | " + tipo + " | " + usuario + " | " + porta + " | " + acao + " | " + modbus + "\n";
             uart.write(linha);
         }
 
@@ -140,7 +151,6 @@ void MenuUART::handleInput(const std::string& input) {
         uart.readLine();
         break;
     }
-
     case MenuOption::OPEN_DOOR_1: {
         uart.write("Digite o nome: ");
         std::string nome;
@@ -151,7 +161,7 @@ void MenuUART::handleInput(const std::string& input) {
         senha = uart.readLine();
 
         if (usuarioManager.validarLoginAdmin(nome, senha)) {
-            portaManager.abrirPorta(nome, 0);
+            portaManager.abrirPorta(0, nome);
             uart.write("Porta 1 liberada!\n");
         } else {
             uart.write("Verifique credenciais, acesso liberado apenas para Admin!\n");
@@ -172,7 +182,7 @@ void MenuUART::handleInput(const std::string& input) {
         senha = uart.readLine();
 
         if (usuarioManager.validarLoginAdmin(nome, senha)) {
-            portaManager.abrirPorta(nome, 1);
+            portaManager.abrirPorta(1, nome);
             uart.write("Porta 2 liberada!\n");
         } else {
             uart.write("Verifique credenciais, acesso liberado apenas para Admin!\n");

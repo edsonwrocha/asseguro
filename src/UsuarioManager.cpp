@@ -31,7 +31,7 @@ void UsuarioManager::salvarNoCSV() {
 void UsuarioManager::adicionarUsuario(const Usuario& usuario) {
     usuarios.push_back(usuario);
     salvarNoCSV(); // salva imediatamente
-    Evento e(usuario.getNome(), TipoEvento::CRIACAO_USUARIO);
+    Evento e(usuario.getNome(), usuario.getTipoStr());
     eventoManager.registrarEvento(e);
 }
 

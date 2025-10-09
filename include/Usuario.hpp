@@ -20,7 +20,7 @@ class Usuario {
     const std::string& getNome() const;
     const std::string& getSenha() const;
     TipoUsuario getTipo() const;
-
+    std::string getTipoStr() const;
     bool isAdmin() const;
 
     std::string toCSV() const;
