@@ -9,29 +9,32 @@ void PortaManager::adicionarPorta(int pin, const std::string& nome) {
     std::cout << "[PortaManager] Porta '" << nome << "' adicionada.\n";
 }
 
-bool PortaManager::abrirPorta(std::string& nome, int id) {
+bool PortaManager::abrirPorta(int id, const std::string& nome) {
     if (id < 0 || id >= (int)portas.size()) {
         std::cerr << "[PortaManager] ID inválido.\n";
         return false;
     }
 
-    portas[id]->abrirComTimeout(5000);
-    Evento e;
-    if (id == 0) {
-        e = Evento(nome, TipoEvento::ABERTURA_PORTA_1);
-    } else if (id == 1) {
-        e = Evento(nome, TipoEvento::ABERTURA_PORTA_2);
-    }
+    std::string pacoteModbus = "000000";
+    Evento e(id + 1, "abrir", pacoteModbus, nome);
     eventoManager.registrarEvento(e);
+    portas[id]->abrir();
+    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+    fecharPorta(id, nome);
     return true;
 }
 
-bool PortaManager::fecharPorta(int id) {
+bool PortaManager::fecharPorta(int id, const std::string& nome) {
     if (id < 0 || id >= (int)portas.size()) {
         std::cerr << "[PortaManager] ID inválido.\n";
         return false;
     }
 
     portas[id]->fechar();
+
+    std::string pacoteModbus = "000000";
+    Evento e(id + 1, "fechar", pacoteModbus, nome);
+    eventoManager.registrarEvento(e);
+
     return true;
 }
