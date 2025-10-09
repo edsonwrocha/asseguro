@@ -201,7 +201,8 @@ void MenuUART::handleInput(const std::string& input) {
 }
 
 void MenuUART::run() {
-    while (running) {
+    while (true) {
+        std::cout << "porra";
         show();
         std::string input = uart.readLine();
         handleInput(input);
