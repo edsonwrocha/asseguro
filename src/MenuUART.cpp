@@ -101,6 +101,22 @@ void MenuUART::handleInput(const std::string& input) {
     }
 
     case MenuOption::LIST_EVENTS: {
+        uart.write("Digite o admin: ");
+        std::string nome;
+        nome = uart.readLine();
+
+        uart.write("Digite a senha admin: ");
+        std::string senha;
+        senha = uart.readLine();
+
+        if (!usuarioManager.validarLoginAdmin(nome, senha)) {
+            uart.write("Verifique credenciais, acesso liberado apenas para Admin!\n");
+
+            uart.write("\nPressione Enter para voltar ao menu: ");
+            uart.readLine();
+            return;
+        }
+
         uart.write("Listando eventos em formato de tabela...\n\n");
 
         // Cabeçalho
@@ -160,11 +176,11 @@ void MenuUART::handleInput(const std::string& input) {
         std::string senha;
         senha = uart.readLine();
 
-        if (usuarioManager.validarLoginAdmin(nome, senha)) {
-            portaManager.abrirPorta(0, nome);
+        if (usuarioManager.validarLogin(nome, senha)) {
             uart.write("Porta 1 liberada!\n");
+            portaManager.abrirPorta(0, nome);
         } else {
-            uart.write("Verifique credenciais, acesso liberado apenas para Admin!\n");
+            uart.write("Verifique credenciais, acesso liberado apenas para usuarios cadastrados!\n");
         }
 
 
@@ -181,11 +197,11 @@ void MenuUART::handleInput(const std::string& input) {
         std::string senha;
         senha = uart.readLine();
 
-        if (usuarioManager.validarLoginAdmin(nome, senha)) {
-            portaManager.abrirPorta(1, nome);
+        if (usuarioManager.validarLogin(nome, senha)) {
             uart.write("Porta 2 liberada!\n");
+            portaManager.abrirPorta(1, nome);
         } else {
-            uart.write("Verifique credenciais, acesso liberado apenas para Admin!\n");
+            uart.write("Verifique credenciais, acesso liberado apenas para usuarios cadastrados!\n");
         }
 
 
