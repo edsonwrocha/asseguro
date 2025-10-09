@@ -1,4 +1,5 @@
 #include "PortaManager.hpp"
+#include "Modbus.hpp"
 #include <iostream>
 
 PortaManager::PortaManager(EventoManager& eventoManager) : eventoManager(eventoManager) {}
@@ -15,7 +16,22 @@ bool PortaManager::abrirPorta(int id, const std::string& nome) {
         return false;
     }
 
-    std::string pacoteModbus = "000000";
+    Modbus::Porta portaEnum;
+    switch (id) {
+    case 0:
+        portaEnum = Modbus::Porta::PORTA1;
+        break;
+    case 1:
+        portaEnum = Modbus::Porta::PORTA2;
+        break;
+    default:
+        std::cerr << "[PortaManager] ID inválido.\n";
+        return false;
+    }
+
+    Modbus comando1(1, portaEnum, Modbus::Estado::ABERTO);
+
+    std::string pacoteModbus = comando1.modbusToStr();
     Evento e(id + 1, "abrir", pacoteModbus, nome);
     eventoManager.registrarEvento(e);
     portas[id]->abrir();
@@ -32,7 +48,22 @@ bool PortaManager::fecharPorta(int id, const std::string& nome) {
 
     portas[id]->fechar();
 
-    std::string pacoteModbus = "000000";
+    Modbus::Porta portaEnum;
+    switch (id) {
+    case 0:
+        portaEnum = Modbus::Porta::PORTA1;
+        break;
+    case 1:
+        portaEnum = Modbus::Porta::PORTA2;
+        break;
+    default:
+        std::cerr << "[PortaManager] ID inválido.\n";
+        return false;
+    }
+
+    Modbus comando1(1, portaEnum, Modbus::Estado::FECHADO);
+
+    std::string pacoteModbus = comando1.modbusToStr();
     Evento e(id + 1, "fechar", pacoteModbus, nome);
     eventoManager.registrarEvento(e);
 
