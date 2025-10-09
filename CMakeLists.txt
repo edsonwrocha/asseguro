@@ -19,6 +19,8 @@ add_executable(asseguro
     src/CurlHTTPCliente.cpp
     src/UARTReal.cpp
     src/Modbus.cpp
+    src/Config.cpp
+    src/Asseguro.cpp
 )
 
 find_package(PkgConfig REQUIRED)
