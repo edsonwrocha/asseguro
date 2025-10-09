@@ -2,22 +2,48 @@
 #include <cstring>
 
 UARTReal::UARTReal(const std::string& port, int baudrate) {
-    serial_fd = open(port.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
+    serial_fd = open(port.c_str(), O_RDWR | O_NOCTTY);
     if (serial_fd < 0) {
         perror("Erro ao abrir porta serial");
         throw std::runtime_error("Erro ao abrir porta serial: " + port);
     }
 
-    struct termios tty;
+    struct termios tty{};
     if (tcgetattr(serial_fd, &tty) != 0) {
         perror("tcgetattr");
         close(serial_fd);
         throw std::runtime_error("Erro ao obter atributos da UART");
     }
 
-    // Mesma configuração do seu código base
-    cfsetospeed(&tty, baudrate);
-    cfsetispeed(&tty, baudrate);
+    cfmakeraw(&tty); // garante modo raw (sem eco, canônico, etc.)
+
+    // ⚙️ Mapeia o baudrate numérico para a constante certa
+    speed_t speed;
+    switch (baudrate) {
+    case 9600:
+        speed = B9600;
+        break;
+    case 19200:
+        speed = B19200;
+        break;
+    case 38400:
+        speed = B38400;
+        break;
+    case 57600:
+        speed = B57600;
+        break;
+    case 115200:
+        speed = B115200;
+        break;
+    default:
+        std::cerr << "[UARTReal] Baudrate não suportado: " << baudrate
+                  << ", usando 115200" << std::endl;
+        speed = B115200;
+        break;
+    }
+
+    cfsetospeed(&tty, speed);
+    cfsetispeed(&tty, speed);
 
     tty.c_cflag &= ~PARENB;
     tty.c_cflag &= ~CSTOPB;
@@ -26,11 +52,7 @@ UARTReal::UARTReal(const std::string& port, int baudrate) {
     tty.c_cflag &= ~CRTSCTS;
     tty.c_cflag |= (CREAD | CLOCAL);
 
-    tty.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
-    tty.c_iflag &= ~(IXON | IXOFF | IXANY);
-    tty.c_oflag &= ~OPOST;
-
-    // ⚠️ IMPORTANTE: o read() precisa ser bloqueante para se comportar como getline()
+    // modo bloqueante (para getline ou leitura contínua)
     fcntl(serial_fd, F_SETFL, 0);
 
     if (tcsetattr(serial_fd, TCSANOW, &tty) != 0) {
@@ -39,7 +61,8 @@ UARTReal::UARTReal(const std::string& port, int baudrate) {
         throw std::runtime_error("Erro ao configurar UART");
     }
 
-    std::cout << "[UARTReal] Porta " << port << " aberta com sucesso." << std::endl;
+    std::cout << "[UARTReal] Porta " << port << " aberta a "
+              << baudrate << " baud com sucesso." << std::endl;
 }
 
 UARTReal::~UARTReal() {
@@ -76,8 +99,6 @@ std::string UARTReal::readLine() {
     while (true) {
         n = ::read(serial_fd, &ch, 1);
         if (n > 0) {
-            if (ch == '\r') continue;
-
             if (ch == 0x7F || ch == '\b') {
                 if (!line.empty()) {
                     line.pop_back();          // remove do buffer
@@ -87,7 +108,7 @@ std::string UARTReal::readLine() {
                 continue;
             }
 
-            if (ch == '\n') {
+            if (ch == '\n' || ch == '\r') {
                 const char* rn = "\r\n";
                 ::write(serial_fd, rn, 2);
                 break;
