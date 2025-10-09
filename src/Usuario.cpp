@@ -7,6 +7,16 @@ const std::string& Usuario::getNome() const { return nome; }
 const std::string& Usuario::getSenha() const { return senha; }
 TipoUsuario Usuario::getTipo() const { return tipo; }
 
+std::string Usuario::getTipoStr() const {
+    switch (tipo) {
+    case TipoUsuario::ADMIN:
+        return "admin";
+    case TipoUsuario::REGULAR:
+    default:
+        return "regular";
+    }
+}
+
 bool Usuario::isAdmin() const { return tipo == TipoUsuario::ADMIN; }
 
 // Serialização para CSV

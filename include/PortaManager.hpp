@@ -13,6 +13,6 @@ class PortaManager {
     PortaManager(EventoManager& eventoManager);
 
     void adicionarPorta(int pin, const std::string& nome);
-    bool abrirPorta(std::string& nome, int id);
-    bool fecharPorta(int id);
+    bool abrirPorta(int id, const std::string& nome);
+    bool fecharPorta(int id, const std::string& nome);
 };
